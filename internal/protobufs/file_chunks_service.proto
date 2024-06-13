@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+
+option go_package = "/protobufs";
+
+
+message FileChunk {
+    string user_id = 1;
+    string file_path = 2;
+    int32 chunk_index = 3;
+    int32 num_total_chunks = 4;
+}
+
+
+message FileChunks {
+    repeated FileChunk file_chunks = 1;
+}
+
+
+message FileChunkSaveStatus {
+    string file_path = 1;
+    bool is_last_saved_chunk = 2;
+}
+
+
+message SaveFileChunksResponse {
+    repeated FileChunkSaveStatus file_chunk_statuses = 1;
+}
+
+
+service FileChunksService {
+    rpc SaveFileChunks(FileChunks) returns (SaveFileChunksResponse);
+}
