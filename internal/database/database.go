@@ -10,7 +10,7 @@ type FileChunk struct {
 }
 
 type Database interface {
-	BatchSave([]FileChunk) error
+	BatchSaveFileChunks([]FileChunk) error
 }
 
 var (
@@ -20,7 +20,7 @@ var (
 
 func GetInstance() Database {
 	once.Do(func() {
-		singletonInstance = &PostgreSql{}
+		singletonInstance = &MongoDB{}
 	})
 
 	return singletonInstance

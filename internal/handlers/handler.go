@@ -13,15 +13,15 @@ type FileSaveStatus struct {
 	chunksSaveStatus []bool
 }
 
+type FileChunkSaveStatus struct {
+	filePath         string
+	isLastSavedChunk bool
+}
+
 type FileChunksServiceHandler struct {
 	pb.FileChunksServiceServer
 	fileChunks map[string]map[string]FileSaveStatus
 	mutex      sync.Mutex
-}
-
-type FileChunkSaveStatus struct {
-	filePath         string
-	isLastSavedChunk bool
 }
 
 func NewFileChunksServiceHandler() *FileChunksServiceHandler {
@@ -31,7 +31,7 @@ func NewFileChunksServiceHandler() *FileChunksServiceHandler {
 	}
 }
 
-func (f *FileChunksServiceHandler) SaveFileChunks(ctx context.Context, req *pb.FileChunks) (*pb.SaveFileChunksResponse, error) {
+func (f *FileChunksServiceHandler) SaveFileChunks(ctx context.Context, req *pb.SaveFileChunksRequest) (*pb.SaveFileChunksResponse, error) {
 	var fileChunks []db.FileChunk
 
 	for _, fileChunk := range req.FileChunks {
@@ -43,7 +43,7 @@ func (f *FileChunksServiceHandler) SaveFileChunks(ctx context.Context, req *pb.F
 		})
 	}
 
-	if err := db.GetInstance().BatchSave(fileChunks); err != nil {
+	if err := db.GetInstance().BatchSaveFileChunks(fileChunks); err != nil {
 		panic("error batch-saving file chunks")
 	}
 

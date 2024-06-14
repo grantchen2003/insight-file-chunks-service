@@ -9,10 +9,11 @@ message FileChunk {
     string file_path = 2;
     int32 chunk_index = 3;
     int32 num_total_chunks = 4;
+    string content = 5;
 }
 
 
-message FileChunks {
+message SaveFileChunksRequest {
     repeated FileChunk file_chunks = 1;
 }
 
@@ -29,5 +30,5 @@ message SaveFileChunksResponse {
 
 
 service FileChunksService {
-    rpc SaveFileChunks(FileChunks) returns (SaveFileChunksResponse);
+    rpc SaveFileChunks(SaveFileChunksRequest) returns (SaveFileChunksResponse);
 }

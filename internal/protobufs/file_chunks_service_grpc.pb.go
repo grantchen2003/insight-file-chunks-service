@@ -26,7 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FileChunksServiceClient interface {
-	SaveFileChunks(ctx context.Context, in *FileChunks, opts ...grpc.CallOption) (*SaveFileChunksResponse, error)
+	SaveFileChunks(ctx context.Context, in *SaveFileChunksRequest, opts ...grpc.CallOption) (*SaveFileChunksResponse, error)
 }
 
 type fileChunksServiceClient struct {
@@ -37,7 +37,7 @@ func NewFileChunksServiceClient(cc grpc.ClientConnInterface) FileChunksServiceCl
 	return &fileChunksServiceClient{cc}
 }
 
-func (c *fileChunksServiceClient) SaveFileChunks(ctx context.Context, in *FileChunks, opts ...grpc.CallOption) (*SaveFileChunksResponse, error) {
+func (c *fileChunksServiceClient) SaveFileChunks(ctx context.Context, in *SaveFileChunksRequest, opts ...grpc.CallOption) (*SaveFileChunksResponse, error) {
 	out := new(SaveFileChunksResponse)
 	err := c.cc.Invoke(ctx, FileChunksService_SaveFileChunks_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -50,7 +50,7 @@ func (c *fileChunksServiceClient) SaveFileChunks(ctx context.Context, in *FileCh
 // All implementations must embed UnimplementedFileChunksServiceServer
 // for forward compatibility
 type FileChunksServiceServer interface {
-	SaveFileChunks(context.Context, *FileChunks) (*SaveFileChunksResponse, error)
+	SaveFileChunks(context.Context, *SaveFileChunksRequest) (*SaveFileChunksResponse, error)
 	mustEmbedUnimplementedFileChunksServiceServer()
 }
 
@@ -58,7 +58,7 @@ type FileChunksServiceServer interface {
 type UnimplementedFileChunksServiceServer struct {
 }
 
-func (UnimplementedFileChunksServiceServer) SaveFileChunks(context.Context, *FileChunks) (*SaveFileChunksResponse, error) {
+func (UnimplementedFileChunksServiceServer) SaveFileChunks(context.Context, *SaveFileChunksRequest) (*SaveFileChunksResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SaveFileChunks not implemented")
 }
 func (UnimplementedFileChunksServiceServer) mustEmbedUnimplementedFileChunksServiceServer() {}
@@ -75,7 +75,7 @@ func RegisterFileChunksServiceServer(s grpc.ServiceRegistrar, srv FileChunksServ
 }
 
 func _FileChunksService_SaveFileChunks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(FileChunks)
+	in := new(SaveFileChunksRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func _FileChunksService_SaveFileChunks_Handler(srv interface{}, ctx context.Cont
 		FullMethod: FileChunksService_SaveFileChunks_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FileChunksServiceServer).SaveFileChunks(ctx, req.(*FileChunks))
+		return srv.(FileChunksServiceServer).SaveFileChunks(ctx, req.(*SaveFileChunksRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
