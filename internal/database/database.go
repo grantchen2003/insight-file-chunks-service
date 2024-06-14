@@ -20,7 +20,7 @@ var (
 
 func GetSingletonInstance() Database {
 	once.Do(func() {
-		singletonInstance = &MongoDB{}
+		singletonInstance = &MongoDb{}
 	})
 
 	return singletonInstance

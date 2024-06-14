@@ -9,12 +9,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type MongoDB struct {
+type MongoDb struct {
 	client      *mongo.Client
 	isConnected bool
 }
 
-func (mongodb *MongoDB) connect() error {
+func (mongodb *MongoDb) connect() error {
 	mongodbUri := os.Getenv("MONGODB_URI")
 
 	// Connect to the database.
@@ -39,7 +39,7 @@ func (mongodb *MongoDB) connect() error {
 	return err
 }
 
-func (mongodb *MongoDB) BatchSaveFileChunks(fileChunks []FileChunk) error {
+func (mongodb *MongoDb) BatchSaveFileChunks(fileChunks []FileChunk) error {
 	if !mongodb.isConnected {
 		err := mongodb.connect()
 		if err != nil {
