@@ -18,7 +18,7 @@ var (
 	once              sync.Once
 )
 
-func GetInstance() Database {
+func GetSingletonInstance() Database {
 	once.Do(func() {
 		singletonInstance = &MongoDB{}
 	})

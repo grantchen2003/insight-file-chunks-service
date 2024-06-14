@@ -43,7 +43,7 @@ func (f *FileChunksServiceHandler) SaveFileChunks(ctx context.Context, req *pb.S
 		})
 	}
 
-	if err := db.GetInstance().BatchSaveFileChunks(fileChunks); err != nil {
+	if err := db.GetSingletonInstance().BatchSaveFileChunks(fileChunks); err != nil {
 		panic("error batch-saving file chunks")
 	}
 

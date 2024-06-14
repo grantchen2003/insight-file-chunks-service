@@ -10,10 +10,11 @@ import (
 )
 
 type MongoDB struct {
-	client *mongo.Client
+	client      *mongo.Client
+	isConnected bool
 }
 
-func (mongodb *MongoDB) Connect() error {
+func (mongodb *MongoDB) connect() error {
 	mongodbUri := os.Getenv("MONGODB_URI")
 
 	// Connect to the database.
@@ -33,21 +34,19 @@ func (mongodb *MongoDB) Connect() error {
 
 	fmt.Println("Connected to MongoDB")
 
-	return err
-}
-
-func (mongodb *MongoDB) Close() error {
-	err := mongodb.client.Disconnect(context.TODO())
-	if err != nil {
-		return err
-	}
-
-	fmt.Println("Connection closed.")
+	mongodb.isConnected = true
 
 	return err
 }
 
 func (mongodb *MongoDB) BatchSaveFileChunks(fileChunks []FileChunk) error {
+	if !mongodb.isConnected {
+		err := mongodb.connect()
+		if err != nil {
+			panic("could not connect to mongodb")
+		}
+	}
+
 	var documents []interface{}
 
 	for _, fileChunk := range fileChunks {
