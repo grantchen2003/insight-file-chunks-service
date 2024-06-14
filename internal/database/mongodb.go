@@ -27,7 +27,7 @@ func (mongodb *MongoDb) connect() error {
 	mongodb.client = client
 
 	// Check the connection.
-	err = client.Ping(context.Background(), nil)
+	err = mongodb.client.Ping(context.Background(), nil)
 	if err != nil {
 		return err
 	}
@@ -36,7 +36,7 @@ func (mongodb *MongoDb) connect() error {
 
 	mongodb.isConnected = true
 
-	return err
+	return nil
 }
 
 func (mongodb *MongoDb) BatchSaveFileChunks(fileChunks []FileChunk) error {

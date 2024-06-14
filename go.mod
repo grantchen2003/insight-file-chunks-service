@@ -3,6 +3,8 @@ module github.com/grantchen2003/insight/filechunks
 go 1.21.5
 
 require (
+	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/go-sql-driver/mysql v1.8.1 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
