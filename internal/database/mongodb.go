@@ -2,7 +2,7 @@ package database
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"os"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -14,7 +14,7 @@ type MongoDb struct {
 	isConnected bool
 }
 
-func (mongodb *MongoDb) connect() error {
+func (mongodb *MongoDb) Connect() error {
 	mongodbUri := os.Getenv("MONGODB_URI")
 
 	// Connect to the database.
@@ -32,21 +32,26 @@ func (mongodb *MongoDb) connect() error {
 		return err
 	}
 
-	fmt.Println("Connected to MongoDB")
-
 	mongodb.isConnected = true
+
+	log.Println("connected to MongoDB")
+
+	return nil
+}
+
+func (mongodb *MongoDb) Close() error {
+	if err := mongodb.client.Disconnect(context.TODO()); err != nil {
+		return err
+	}
+
+	mongodb.isConnected = false
+
+	log.Println("connection to MongoDB closed")
 
 	return nil
 }
 
 func (mongodb *MongoDb) BatchSaveFileChunks(fileChunks []FileChunk) error {
-	if !mongodb.isConnected {
-		err := mongodb.connect()
-		if err != nil {
-			panic("could not connect to mongodb")
-		}
-	}
-
 	var documents []interface{}
 
 	for _, fileChunk := range fileChunks {

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"log"
 	"sync"
 
 	db "github.com/grantchen2003/insight/filechunks/internal/database"
@@ -32,6 +33,8 @@ func NewFileChunksServiceHandler() *FileChunksServiceHandler {
 }
 
 func (f *FileChunksServiceHandler) SaveFileChunks(ctx context.Context, req *pb.SaveFileChunksRequest) (*pb.SaveFileChunksResponse, error) {
+	log.Println("received SaveFileChunks request")
+
 	var fileChunks []db.FileChunk
 
 	for _, fileChunk := range req.FileChunks {

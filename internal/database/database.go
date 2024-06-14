@@ -10,6 +10,8 @@ type FileChunk struct {
 }
 
 type Database interface {
+	Connect() error
+	Close() error
 	BatchSaveFileChunks([]FileChunk) error
 }
 
