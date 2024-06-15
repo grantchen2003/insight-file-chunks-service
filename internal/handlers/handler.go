@@ -6,7 +6,6 @@ import (
 
 	db "github.com/grantchen2003/insight/filechunks/internal/database"
 	"github.com/grantchen2003/insight/filechunks/internal/filestorage"
-	fileStorage "github.com/grantchen2003/insight/filechunks/internal/filestorage"
 	pb "github.com/grantchen2003/insight/filechunks/internal/protobufs"
 	fcss "github.com/grantchen2003/insight/filechunks/internal/utils/filechunksavesync"
 )
@@ -91,7 +90,7 @@ func batchSaveFileChunkPayloadContents(fileChunkPayloads []*pb.FileChunkPayload)
 		fileChunkPayloadContents = append(fileChunkPayloadContents, fileChunkPayload.Content)
 	}
 
-	return fileStorage.GetSingletonInstance().BatchSaveFileContents(fileChunkPayloadContents)
+	return filestorage.GetSingletonInstance().BatchSaveFileContents(fileChunkPayloadContents)
 }
 
 func getFileChunks(fileChunkPayloads []*pb.FileChunkPayload, fileStorageIds []string) []db.FileChunk {
