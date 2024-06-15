@@ -27,16 +27,16 @@ func (lfs *LocalFileStorage) BatchSaveFileContents(base64FileContents []string) 
 }
 
 func (lfs *LocalFileStorage) SaveFileContent(base64FileContent string) (string, error) {
+	if err := lfs.ensureStorageFolderExists(); err != nil {
+		panic("could not ensure storage folder exists")
+	}
+
 	decodedFileContent, err := base64.StdEncoding.DecodeString(base64FileContent)
 	if err != nil {
 		panic("could not decode base 64 string")
 	}
 
 	id := uuid.New().String()
-
-	if err := lfs.ensureStorageFolderExists(); err != nil {
-		panic("could not ensure storage folder exists")
-	}
 
 	storageFilePath := filepath.Join(lfs.storageFolderPath, id)
 

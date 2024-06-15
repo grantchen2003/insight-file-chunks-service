@@ -21,6 +21,22 @@ type FileChunkSaveSync struct {
 	data  map[string]map[string]FileSaveStatus
 }
 
+var (
+	singletonInstance *FileChunkSaveSync
+	once              sync.Once
+)
+
+func GetSingletonInstance() *FileChunkSaveSync {
+	once.Do(func() {
+		singletonInstance = &FileChunkSaveSync{
+			data:  make(map[string]map[string]FileSaveStatus),
+			mutex: sync.Mutex{},
+		}
+	})
+
+	return singletonInstance
+}
+
 func (f *FileChunkSaveSync) ReportFileChunkSaves(fileChunks []db.FileChunk) []FileChunkSaveStatus {
 	f.mutex.Lock()
 	defer f.mutex.Unlock()
@@ -81,20 +97,4 @@ func (f *FileChunkSaveSync) cleanupFileChunks(userId string, filePath string) {
 	if len(f.data[userId]) == 0 {
 		delete(f.data, userId)
 	}
-}
-
-var (
-	singletonInstance *FileChunkSaveSync
-	once              sync.Once
-)
-
-func GetSingletonInstance() *FileChunkSaveSync {
-	once.Do(func() {
-		singletonInstance = &FileChunkSaveSync{
-			data:  make(map[string]map[string]FileSaveStatus),
-			mutex: sync.Mutex{},
-		}
-	})
-
-	return singletonInstance
 }

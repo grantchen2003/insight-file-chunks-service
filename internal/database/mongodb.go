@@ -10,29 +10,23 @@ import (
 )
 
 type MongoDb struct {
-	client      *mongo.Client
-	isConnected bool
+	client *mongo.Client
 }
 
 func (mongodb *MongoDb) Connect() error {
 	mongodbUri := os.Getenv("MONGODB_URI")
-
-	// Connect to the database.
 	clientOptions := options.Client().ApplyURI(mongodbUri)
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
 		return err
 	}
 
-	mongodb.client = client
-
-	// Check the connection.
-	err = mongodb.client.Ping(context.Background(), nil)
+	err = client.Ping(context.Background(), nil)
 	if err != nil {
 		return err
 	}
 
-	mongodb.isConnected = true
+	mongodb.client = client
 
 	log.Println("connected to MongoDB")
 
@@ -44,19 +38,13 @@ func (mongodb *MongoDb) Close() error {
 		return err
 	}
 
-	mongodb.isConnected = false
-
 	log.Println("connection to MongoDB closed")
 
 	return nil
 }
 
 func (mongodb *MongoDb) SaveFileChunk(fileChunk FileChunk) error {
-	databaseName := os.Getenv("MONGODB_DATABASE_NAME")
-	collectionName := os.Getenv("MONGODB_COLLECTION_NAME")
-
-	collection := mongodb.client.Database(databaseName).Collection(collectionName)
-	_, err := collection.InsertOne(context.Background(), fileChunk)
+	_, err := mongodb.getCollection().InsertOne(context.Background(), fileChunk)
 
 	return err
 }
@@ -68,11 +56,14 @@ func (mongodb *MongoDb) BatchSaveFileChunks(fileChunks []FileChunk) error {
 		documents = append(documents, fileChunk)
 	}
 
+	_, err := mongodb.getCollection().InsertMany(context.Background(), documents)
+
+	return err
+}
+
+func (mongodb *MongoDb) getCollection() *mongo.Collection {
 	databaseName := os.Getenv("MONGODB_DATABASE_NAME")
 	collectionName := os.Getenv("MONGODB_COLLECTION_NAME")
 
-	collection := mongodb.client.Database(databaseName).Collection(collectionName)
-	_, err := collection.InsertMany(context.Background(), documents)
-
-	return err
+	return mongodb.client.Database(databaseName).Collection(collectionName)
 }

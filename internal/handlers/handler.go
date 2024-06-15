@@ -74,6 +74,9 @@ func (f *FileChunksServiceHandler) SaveFileChunks(ctx context.Context, req *pb.S
 
 	fileChunkSaveStatuses := fcss.GetSingletonInstance().ReportFileChunkSaves(fileChunks)
 
-	pbFileChunkSaveStatuses := castToPbFileChunkSaveStatuses(fileChunkSaveStatuses)
-	return &pb.SaveFileChunksResponse{FileChunkStatuses: pbFileChunkSaveStatuses}, nil
+	resp := &pb.SaveFileChunksResponse{
+		FileChunkStatuses: castToPbFileChunkSaveStatuses(fileChunkSaveStatuses),
+	}
+
+	return resp, nil
 }
