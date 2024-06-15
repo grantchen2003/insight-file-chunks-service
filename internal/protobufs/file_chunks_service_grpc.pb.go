@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	FileChunksService_SaveFileChunks_FullMethodName = "/FileChunksService/SaveFileChunks"
+	FileChunksService_SaveFileChunks_FullMethodName             = "/FileChunksService/SaveFileChunks"
+	FileChunksService_GetSortedFileChunksContent_FullMethodName = "/FileChunksService/GetSortedFileChunksContent"
 )
 
 // FileChunksServiceClient is the client API for FileChunksService service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FileChunksServiceClient interface {
 	SaveFileChunks(ctx context.Context, in *SaveFileChunksRequest, opts ...grpc.CallOption) (*SaveFileChunksResponse, error)
+	GetSortedFileChunksContent(ctx context.Context, in *GetSortedFileChunksContentRequest, opts ...grpc.CallOption) (*GetSortedFileChunksContentResponse, error)
 }
 
 type fileChunksServiceClient struct {
@@ -46,11 +48,21 @@ func (c *fileChunksServiceClient) SaveFileChunks(ctx context.Context, in *SaveFi
 	return out, nil
 }
 
+func (c *fileChunksServiceClient) GetSortedFileChunksContent(ctx context.Context, in *GetSortedFileChunksContentRequest, opts ...grpc.CallOption) (*GetSortedFileChunksContentResponse, error) {
+	out := new(GetSortedFileChunksContentResponse)
+	err := c.cc.Invoke(ctx, FileChunksService_GetSortedFileChunksContent_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // FileChunksServiceServer is the server API for FileChunksService service.
 // All implementations must embed UnimplementedFileChunksServiceServer
 // for forward compatibility
 type FileChunksServiceServer interface {
 	SaveFileChunks(context.Context, *SaveFileChunksRequest) (*SaveFileChunksResponse, error)
+	GetSortedFileChunksContent(context.Context, *GetSortedFileChunksContentRequest) (*GetSortedFileChunksContentResponse, error)
 	mustEmbedUnimplementedFileChunksServiceServer()
 }
 
@@ -60,6 +72,9 @@ type UnimplementedFileChunksServiceServer struct {
 
 func (UnimplementedFileChunksServiceServer) SaveFileChunks(context.Context, *SaveFileChunksRequest) (*SaveFileChunksResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SaveFileChunks not implemented")
+}
+func (UnimplementedFileChunksServiceServer) GetSortedFileChunksContent(context.Context, *GetSortedFileChunksContentRequest) (*GetSortedFileChunksContentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSortedFileChunksContent not implemented")
 }
 func (UnimplementedFileChunksServiceServer) mustEmbedUnimplementedFileChunksServiceServer() {}
 
@@ -92,6 +107,24 @@ func _FileChunksService_SaveFileChunks_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _FileChunksService_GetSortedFileChunksContent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSortedFileChunksContentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FileChunksServiceServer).GetSortedFileChunksContent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FileChunksService_GetSortedFileChunksContent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FileChunksServiceServer).GetSortedFileChunksContent(ctx, req.(*GetSortedFileChunksContentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // FileChunksService_ServiceDesc is the grpc.ServiceDesc for FileChunksService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -102,6 +135,10 @@ var FileChunksService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SaveFileChunks",
 			Handler:    _FileChunksService_SaveFileChunks_Handler,
+		},
+		{
+			MethodName: "GetSortedFileChunksContent",
+			Handler:    _FileChunksService_GetSortedFileChunksContent_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -41,6 +42,42 @@ func (mongodb *MongoDb) Close() error {
 	log.Println("connection to MongoDB closed")
 
 	return nil
+}
+
+func (mongodb *MongoDb) GetSortedFileChunksFileStorageIds(userId string, filePath string) ([]string, error) {
+	filter := bson.D{
+		{"userid", userId},
+		{"filepath", filePath},
+	}
+
+	findOptions := options.Find()
+	findOptions.SetSort(bson.D{{"chunkindex", 1}})
+	findOptions.SetProjection(bson.D{
+		{"filestorageid", 1},
+		{"_id", 0},
+	})
+
+	log.Println("here1")
+
+	cursor, err := mongodb.getCollection().Find(context.TODO(), filter, findOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Println("here2")
+	var results []map[string]string
+
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		return nil, err
+	}
+
+	var fileStorageIds []string
+	for _, result := range results {
+		cursor.Decode(&result)
+		fileStorageIds = append(fileStorageIds, result["filestorageid"])
+	}
+
+	return fileStorageIds, nil
 }
 
 func (mongodb *MongoDb) SaveFileChunk(fileChunk FileChunk) error {

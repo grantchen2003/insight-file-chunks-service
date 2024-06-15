@@ -29,6 +29,21 @@ message SaveFileChunksResponse {
 }
 
 
+message GetSortedFileChunksContentRequest {
+    string user_id = 1;
+    string file_path = 2;
+}
+
+message FileChunkContent {
+    string content = 1;
+}
+
+message GetSortedFileChunksContentResponse {
+    repeated FileChunkContent file_chunks_content = 1;
+}
+
+
 service FileChunksService {
     rpc SaveFileChunks(SaveFileChunksRequest) returns (SaveFileChunksResponse);
+    rpc GetSortedFileChunksContent(GetSortedFileChunksContentRequest) returns (GetSortedFileChunksContentResponse);
 }

@@ -2,9 +2,9 @@ package filestorage
 
 import (
 	"encoding/base64"
+	"io/ioutil"
 	"os"
 	"path/filepath"
-	"sync"
 
 	"github.com/google/uuid"
 )
@@ -13,33 +13,46 @@ type LocalFileStorage struct {
 	storageFolderPath string
 }
 
-func (lfs *LocalFileStorage) BatchSaveFileContents(base64FileContents []string) ([]string, error) {
-	var wg sync.WaitGroup
-	var mu sync.Mutex
+func NewLocalFileStorage() *LocalFileStorage {
+	return &LocalFileStorage{
+		storageFolderPath: "./internal/filestorage/localstorage",
+	}
+}
 
-	ids := make([]string, len(base64FileContents))
-	errs := make(chan error, len(base64FileContents))
+func (lfs *LocalFileStorage) GetFileContents(ids []string) ([]string, error) {
+	var fileContents []string
 
-	for i, base64FileContent := range base64FileContents {
-		wg.Add(1)
-		go func(index int, content string) {
-			defer wg.Done()
-			id, err := lfs.SaveFileContent(content)
-			if err != nil {
-				errs <- err
-				return
-			}
-			mu.Lock()
-			ids[index] = id
-			mu.Unlock()
-		}(i, base64FileContent)
+	for _, id := range ids {
+		storageFilePath := filepath.Join(lfs.storageFolderPath, id)
+
+		file, err := os.Open(storageFilePath)
+		if err != nil {
+			return nil, err
+		}
+		defer file.Close()
+
+		fileContent, err := ioutil.ReadAll(file)
+		if err != nil {
+			return nil, err
+		}
+
+		fileContents = append(fileContents, string(fileContent))
 	}
 
-	wg.Wait()
-	close(errs)
+	return fileContents, nil
+}
 
-	if len(errs) > 0 {
-		return nil, <-errs
+func (lfs *LocalFileStorage) BatchSaveFileContents(base64FileContents []string) ([]string, error) {
+
+	ids := make([]string, len(base64FileContents))
+
+	for i, base64FileContent := range base64FileContents {
+		id, err := lfs.SaveFileContent(base64FileContent)
+		if err != nil {
+			return nil, err
+		}
+
+		ids[i] = id
 	}
 
 	return ids, nil

@@ -13,6 +13,7 @@ type FileChunk struct {
 type Database interface {
 	Connect() error
 	Close() error
+	GetSortedFileChunksFileStorageIds(string, string) ([]string, error)
 	SaveFileChunk(FileChunk) error
 	BatchSaveFileChunks([]FileChunk) error
 }

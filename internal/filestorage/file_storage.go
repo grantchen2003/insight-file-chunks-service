@@ -3,6 +3,7 @@ package filestorage
 import "sync"
 
 type FileStorage interface {
+	GetFileContents([]string) ([]string, error)
 	BatchSaveFileContents([]string) ([]string, error)
 	SaveFileContent(string) (string, error)
 }
@@ -14,7 +15,7 @@ var (
 
 func GetSingletonInstance() FileStorage {
 	once.Do(func() {
-		singletonInstance = &LocalFileStorage{}
+		singletonInstance = NewLocalFileStorage()
 	})
 
 	return singletonInstance
