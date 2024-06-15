@@ -57,14 +57,11 @@ func (mongodb *MongoDb) GetSortedFileChunksFileStorageIds(userId string, filePat
 		{"_id", 0},
 	})
 
-	log.Println("here1")
-
 	cursor, err := mongodb.getCollection().Find(context.TODO(), filter, findOptions)
 	if err != nil {
 		return nil, err
 	}
 
-	log.Println("here2")
 	var results []map[string]string
 
 	if err = cursor.All(context.TODO(), &results); err != nil {
