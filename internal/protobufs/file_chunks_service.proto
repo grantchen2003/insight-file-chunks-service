@@ -4,7 +4,7 @@ syntax = "proto3";
 option go_package = "/protobufs";
 
 
-message FileChunk {
+message FileChunkPayload {
     string user_id = 1;
     string file_path = 2;
     int32 chunk_index = 3;
@@ -14,7 +14,7 @@ message FileChunk {
 
 
 message SaveFileChunksRequest {
-    repeated FileChunk file_chunks = 1;
+    repeated FileChunkPayload file_chunk_payloads = 1;
 }
 
 

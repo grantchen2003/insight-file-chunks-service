@@ -3,7 +3,8 @@ package filestorage
 import "sync"
 
 type FileStorage interface {
-	SaveFile(string) (string, error)
+	BatchSaveFileContents([]string) ([]string, error)
+	SaveFileContent(string) (string, error)
 }
 
 var (

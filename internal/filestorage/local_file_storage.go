@@ -2,6 +2,7 @@ package filestorage
 
 import (
 	"encoding/base64"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -11,7 +12,21 @@ import (
 type LocalFileStorage struct {
 }
 
-func (lfs *LocalFileStorage) SaveFile(base64FileContent string) (string, error) {
+func (lfs *LocalFileStorage) BatchSaveFileContents(base64FileContents []string) ([]string, error) {
+	var ids []string
+
+	for _, base64FileContent := range base64FileContents {
+		id, err := lfs.SaveFileContent(base64FileContent)
+		if err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+
+	return ids, nil
+}
+
+func (lfs *LocalFileStorage) SaveFileContent(base64FileContent string) (string, error) {
 	decodedFileContent, err := base64.StdEncoding.DecodeString(base64FileContent)
 	if err != nil {
 		panic("could not decode base 64 string")
@@ -19,7 +34,16 @@ func (lfs *LocalFileStorage) SaveFile(base64FileContent string) (string, error) 
 
 	id := uuid.New().String()
 
-	storageFilePath := filepath.Join("./internal/filestorage/localstorage", id)
+	storageFolderPath := "./internal/filestorage/localstorage"
+
+	if _, err := os.Stat(storageFolderPath); os.IsNotExist(err) {
+		// Create the folder and any necessary parents
+		if err := os.MkdirAll(storageFolderPath, 0755); err != nil {
+			fmt.Println("Error creating folder:", err)
+		}
+	}
+
+	storageFilePath := filepath.Join(storageFolderPath, id)
 
 	file, err := os.Create(storageFilePath)
 	if err != nil {
@@ -27,8 +51,7 @@ func (lfs *LocalFileStorage) SaveFile(base64FileContent string) (string, error) 
 	}
 	defer file.Close()
 
-	_, err = file.WriteString(string(decodedFileContent))
-	if err != nil {
+	if _, err = file.WriteString(string(decodedFileContent)); err != nil {
 		panic("Error writing to file:")
 	}
 

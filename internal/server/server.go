@@ -18,7 +18,7 @@ func NewServer() *Server {
 	grpcServer := grpc.NewServer()
 
 	protobufs.RegisterFileChunksServiceServer(
-		grpcServer, handlers.NewFileChunksServiceHandler(),
+		grpcServer, &handlers.FileChunksServiceHandler{},
 	)
 
 	return &Server{grpcServer: grpcServer}

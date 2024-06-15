@@ -51,6 +51,16 @@ func (mongodb *MongoDb) Close() error {
 	return nil
 }
 
+func (mongodb *MongoDb) SaveFileChunk(fileChunk FileChunk) error {
+	databaseName := os.Getenv("MONGODB_DATABASE_NAME")
+	collectionName := os.Getenv("MONGODB_COLLECTION_NAME")
+
+	collection := mongodb.client.Database(databaseName).Collection(collectionName)
+	_, err := collection.InsertOne(context.Background(), fileChunk)
+
+	return err
+}
+
 func (mongodb *MongoDb) BatchSaveFileChunks(fileChunks []FileChunk) error {
 	var documents []interface{}
 
