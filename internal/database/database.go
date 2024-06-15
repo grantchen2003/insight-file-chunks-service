@@ -7,6 +7,7 @@ type FileChunk struct {
 	FilePath       string
 	ChunkIndex     int
 	NumTotalChunks int
+	FileStorageId  string
 }
 
 type Database interface {

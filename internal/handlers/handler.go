@@ -6,11 +6,13 @@ import (
 	"sync"
 
 	db "github.com/grantchen2003/insight/filechunks/internal/database"
+	fs "github.com/grantchen2003/insight/filechunks/internal/filestorage"
 	pb "github.com/grantchen2003/insight/filechunks/internal/protobufs"
 )
 
 type FileSaveStatus struct {
 	isFullySaved     bool
+	numTotalChunks   int
 	chunksSaveStatus []bool
 }
 
@@ -38,11 +40,17 @@ func (f *FileChunksServiceHandler) SaveFileChunks(ctx context.Context, req *pb.S
 	var fileChunks []db.FileChunk
 
 	for _, fileChunk := range req.FileChunks {
+		fileStorageId, err := fs.GetSingletonInstance().SaveFile(fileChunk.Content)
+		if err != nil {
+			panic("failed to save file")
+		}
+
 		fileChunks = append(fileChunks, db.FileChunk{
 			UserId:         fileChunk.UserId,
 			FilePath:       fileChunk.FilePath,
 			ChunkIndex:     int(fileChunk.ChunkIndex),
 			NumTotalChunks: int(fileChunk.NumTotalChunks),
+			FileStorageId:  fileStorageId,
 		})
 	}
 
