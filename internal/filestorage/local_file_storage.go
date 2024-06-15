@@ -1,8 +1,7 @@
 package filestorage
 
 import (
-	"encoding/base64"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -19,8 +18,8 @@ func NewLocalFileStorage() *LocalFileStorage {
 	}
 }
 
-func (lfs *LocalFileStorage) GetFileContents(ids []string) ([]string, error) {
-	var fileContents []string
+func (lfs *LocalFileStorage) GetFileContents(ids []string) ([][]byte, error) {
+	var fileContents [][]byte
 
 	for _, id := range ids {
 		storageFilePath := filepath.Join(lfs.storageFolderPath, id)
@@ -31,23 +30,23 @@ func (lfs *LocalFileStorage) GetFileContents(ids []string) ([]string, error) {
 		}
 		defer file.Close()
 
-		fileContent, err := ioutil.ReadAll(file)
+		fileContent, err := io.ReadAll(file)
 		if err != nil {
 			return nil, err
 		}
 
-		fileContents = append(fileContents, string(fileContent))
+		fileContents = append(fileContents, fileContent)
 	}
 
 	return fileContents, nil
 }
 
-func (lfs *LocalFileStorage) BatchSaveFileContents(base64FileContents []string) ([]string, error) {
+func (lfs *LocalFileStorage) BatchSaveFileChunksContent(fileContents [][]byte) ([]string, error) {
 
-	ids := make([]string, len(base64FileContents))
+	ids := make([]string, len(fileContents))
 
-	for i, base64FileContent := range base64FileContents {
-		id, err := lfs.SaveFileContent(base64FileContent)
+	for i, fileContent := range fileContents {
+		id, err := lfs.SaveFileChunkContent(fileContent)
 		if err != nil {
 			return nil, err
 		}
@@ -58,14 +57,9 @@ func (lfs *LocalFileStorage) BatchSaveFileContents(base64FileContents []string) 
 	return ids, nil
 }
 
-func (lfs *LocalFileStorage) SaveFileContent(base64FileContent string) (string, error) {
+func (lfs *LocalFileStorage) SaveFileChunkContent(fileContent []byte) (string, error) {
 	if err := lfs.ensureStorageFolderExists(); err != nil {
 		panic("could not ensure storage folder exists")
-	}
-
-	decodedFileContent, err := base64.StdEncoding.DecodeString(base64FileContent)
-	if err != nil {
-		panic("could not decode base 64 string")
 	}
 
 	id := uuid.New().String()
@@ -78,7 +72,7 @@ func (lfs *LocalFileStorage) SaveFileContent(base64FileContent string) (string, 
 	}
 	defer file.Close()
 
-	if _, err = file.WriteString(string(decodedFileContent)); err != nil {
+	if _, err = file.Write(fileContent); err != nil {
 		panic("Error writing to file:")
 	}
 

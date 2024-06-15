@@ -3,9 +3,9 @@ package filestorage
 import "sync"
 
 type FileStorage interface {
-	GetFileContents([]string) ([]string, error)
-	BatchSaveFileContents([]string) ([]string, error)
-	SaveFileContent(string) (string, error)
+	GetFileContents([]string) ([][]byte, error)
+	BatchSaveFileChunksContent([][]byte) ([]string, error)
+	SaveFileChunkContent([]byte) (string, error)
 }
 
 var (

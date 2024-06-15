@@ -14,7 +14,7 @@ type FileChunksServiceHandler struct {
 	pb.FileChunksServiceServer
 }
 
-func castToPbFileChunksContent(fileChunksContent []string) []*pb.FileChunkContent {
+func castToPbFileChunksContent(fileChunksContent [][]byte) []*pb.FileChunkContent {
 	var pbFileChunksContent []*pb.FileChunkContent
 
 	for _, fileChunkContent := range fileChunksContent {
@@ -84,13 +84,13 @@ func castToPbFileChunkSaveStatuses(fileChunkSaveStatuses []fcss.FileChunkSaveSta
 }
 
 func batchSaveFileChunkPayloadContents(fileChunkPayloads []*pb.FileChunkPayload) ([]string, error) {
-	var fileChunkPayloadContents []string
+	var fileChunkPayloadContents [][]byte
 
 	for _, fileChunkPayload := range fileChunkPayloads {
 		fileChunkPayloadContents = append(fileChunkPayloadContents, fileChunkPayload.Content)
 	}
 
-	return filestorage.GetSingletonInstance().BatchSaveFileContents(fileChunkPayloadContents)
+	return filestorage.GetSingletonInstance().BatchSaveFileChunksContent(fileChunkPayloadContents)
 }
 
 func getFileChunks(fileChunkPayloads []*pb.FileChunkPayload, fileStorageIds []string) []db.FileChunk {
