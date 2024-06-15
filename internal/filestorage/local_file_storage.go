@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/google/uuid"
 )
@@ -13,14 +14,32 @@ type LocalFileStorage struct {
 }
 
 func (lfs *LocalFileStorage) BatchSaveFileContents(base64FileContents []string) ([]string, error) {
-	var ids []string
+	var wg sync.WaitGroup
+	var mu sync.Mutex
 
-	for _, base64FileContent := range base64FileContents {
-		id, err := lfs.SaveFileContent(base64FileContent)
-		if err != nil {
-			return nil, err
-		}
-		ids = append(ids, id)
+	ids := make([]string, len(base64FileContents))
+	errs := make(chan error, len(base64FileContents))
+
+	for i, base64FileContent := range base64FileContents {
+		wg.Add(1)
+		go func(index int, content string) {
+			defer wg.Done()
+			id, err := lfs.SaveFileContent(content)
+			if err != nil {
+				errs <- err
+				return
+			}
+			mu.Lock()
+			ids[index] = id
+			mu.Unlock()
+		}(i, base64FileContent)
+	}
+
+	wg.Wait()
+	close(errs)
+
+	if len(errs) > 0 {
+		return nil, <-errs
 	}
 
 	return ids, nil
