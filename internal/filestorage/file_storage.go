@@ -2,10 +2,12 @@ package filestorage
 
 import "sync"
 
+type FileChunkContent []byte
+
 type FileStorage interface {
-	GetFileContents([]string) ([][]byte, error)
-	BatchSaveFileChunksContent([][]byte) ([]string, error)
-	SaveFileChunkContent([]byte) (string, error)
+	GetFileContents([]string) ([]FileChunkContent, error)
+	BatchSaveFileChunksContent([]FileChunkContent) ([]string, error)
+	SaveFileChunkContent(FileChunkContent) (string, error)
 }
 
 var (

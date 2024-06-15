@@ -18,8 +18,8 @@ func NewLocalFileStorage() *LocalFileStorage {
 	}
 }
 
-func (lfs *LocalFileStorage) GetFileContents(ids []string) ([][]byte, error) {
-	var fileContents [][]byte
+func (lfs *LocalFileStorage) GetFileContents(ids []string) ([]FileChunkContent, error) {
+	var fileContents []FileChunkContent
 
 	for _, id := range ids {
 		storageFilePath := filepath.Join(lfs.storageFolderPath, id)
@@ -41,7 +41,7 @@ func (lfs *LocalFileStorage) GetFileContents(ids []string) ([][]byte, error) {
 	return fileContents, nil
 }
 
-func (lfs *LocalFileStorage) BatchSaveFileChunksContent(fileChunksContent [][]byte) ([]string, error) {
+func (lfs *LocalFileStorage) BatchSaveFileChunksContent(fileChunksContent []FileChunkContent) ([]string, error) {
 	ids := make([]string, len(fileChunksContent))
 
 	for i, fileContent := range fileChunksContent {
@@ -56,7 +56,7 @@ func (lfs *LocalFileStorage) BatchSaveFileChunksContent(fileChunksContent [][]by
 	return ids, nil
 }
 
-func (lfs *LocalFileStorage) SaveFileChunkContent(fileChunkContent []byte) (string, error) {
+func (lfs *LocalFileStorage) SaveFileChunkContent(fileChunkContent FileChunkContent) (string, error) {
 	if err := lfs.ensureStorageFolderExists(); err != nil {
 		panic("could not ensure storage folder exists")
 	}

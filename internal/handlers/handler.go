@@ -14,18 +14,6 @@ type FileChunksServiceHandler struct {
 	pb.FileChunksServiceServer
 }
 
-func castToPbFileChunksContent(fileChunksContent [][]byte) []*pb.FileChunkContent {
-	var pbFileChunksContent []*pb.FileChunkContent
-
-	for _, fileChunkContent := range fileChunksContent {
-		pbFileChunksContent = append(pbFileChunksContent, &pb.FileChunkContent{
-			Content: fileChunkContent,
-		})
-	}
-
-	return pbFileChunksContent
-}
-
 func (f *FileChunksServiceHandler) GetSortedFileChunksContent(ctx context.Context, req *pb.GetSortedFileChunksContentRequest) (*pb.GetSortedFileChunksContentResponse, error) {
 	log.Println("received GetSortedFileChunksContent request")
 
@@ -70,6 +58,18 @@ func (f *FileChunksServiceHandler) SaveFileChunks(ctx context.Context, req *pb.S
 	return resp, nil
 }
 
+func castToPbFileChunksContent(fileChunksContent []filestorage.FileChunkContent) []*pb.FileChunkContent {
+	var pbFileChunksContent []*pb.FileChunkContent
+
+	for _, fileChunkContent := range fileChunksContent {
+		pbFileChunksContent = append(pbFileChunksContent, &pb.FileChunkContent{
+			Content: fileChunkContent,
+		})
+	}
+
+	return pbFileChunksContent
+}
+
 func castToPbFileChunkSaveStatuses(fileChunkSaveStatuses []fcss.FileChunkSaveStatus) []*pb.FileChunkSaveStatus {
 	var pbFileChunkSaveStatuses []*pb.FileChunkSaveStatus
 
@@ -84,7 +84,7 @@ func castToPbFileChunkSaveStatuses(fileChunkSaveStatuses []fcss.FileChunkSaveSta
 }
 
 func batchSaveFileChunkPayloadContents(fileChunkPayloads []*pb.FileChunkPayload) ([]string, error) {
-	var fileChunkPayloadContents [][]byte
+	var fileChunkPayloadContents []filestorage.FileChunkContent
 
 	for _, fileChunkPayload := range fileChunkPayloads {
 		fileChunkPayloadContents = append(fileChunkPayloadContents, fileChunkPayload.Content)
