@@ -27,7 +27,7 @@ func castToPbFileChunkSaveStatuses(fileChunkSaveStatuses []fcss.FileChunkSaveSta
 	return pbFileChunkSaveStatuses
 }
 
-func BatchSaveFileChunkPayloadContents(fileChunkPayloads []*pb.FileChunkPayload) ([]string, error) {
+func batchSaveFileChunkPayloadContents(fileChunkPayloads []*pb.FileChunkPayload) ([]string, error) {
 	var fileChunkPayloadContents []string
 
 	for _, fileChunkPayload := range fileChunkPayloads {
@@ -60,7 +60,7 @@ func getFileChunks(fileChunkPayloads []*pb.FileChunkPayload, fileStorageIds []st
 func (f *FileChunksServiceHandler) SaveFileChunks(ctx context.Context, req *pb.SaveFileChunksRequest) (*pb.SaveFileChunksResponse, error) {
 	log.Println("received SaveFileChunks request")
 
-	fileStorageIds, err := BatchSaveFileChunkPayloadContents(req.FileChunkPayloads)
+	fileStorageIds, err := batchSaveFileChunkPayloadContents(req.FileChunkPayloads)
 	if err != nil {
 		return nil, err
 	}
