@@ -13,7 +13,7 @@ message FileChunkPayload {
 }
 
 
-message SaveFileChunksRequest {
+message CreateFileChunksRequest {
     repeated FileChunkPayload file_chunk_payloads = 1;
 }
 
@@ -24,7 +24,7 @@ message FileChunkSaveStatus {
 }
 
 
-message SaveFileChunksResponse {
+message CreateFileChunksResponse {
     repeated FileChunkSaveStatus file_chunk_statuses = 1;
 }
 
@@ -44,6 +44,6 @@ message GetSortedFileChunksContentResponse {
 
 
 service FileChunksService {
-    rpc SaveFileChunks(SaveFileChunksRequest) returns (SaveFileChunksResponse);
+    rpc CreateFileChunks(CreateFileChunksRequest) returns (CreateFileChunksResponse);
     rpc GetSortedFileChunksContent(GetSortedFileChunksContentRequest) returns (GetSortedFileChunksContentResponse);
 }

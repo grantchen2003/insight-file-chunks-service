@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	FileChunksService_SaveFileChunks_FullMethodName             = "/FileChunksService/SaveFileChunks"
+	FileChunksService_CreateFileChunks_FullMethodName           = "/FileChunksService/CreateFileChunks"
 	FileChunksService_GetSortedFileChunksContent_FullMethodName = "/FileChunksService/GetSortedFileChunksContent"
 )
 
@@ -27,7 +27,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FileChunksServiceClient interface {
-	SaveFileChunks(ctx context.Context, in *SaveFileChunksRequest, opts ...grpc.CallOption) (*SaveFileChunksResponse, error)
+	CreateFileChunks(ctx context.Context, in *CreateFileChunksRequest, opts ...grpc.CallOption) (*CreateFileChunksResponse, error)
 	GetSortedFileChunksContent(ctx context.Context, in *GetSortedFileChunksContentRequest, opts ...grpc.CallOption) (*GetSortedFileChunksContentResponse, error)
 }
 
@@ -39,9 +39,9 @@ func NewFileChunksServiceClient(cc grpc.ClientConnInterface) FileChunksServiceCl
 	return &fileChunksServiceClient{cc}
 }
 
-func (c *fileChunksServiceClient) SaveFileChunks(ctx context.Context, in *SaveFileChunksRequest, opts ...grpc.CallOption) (*SaveFileChunksResponse, error) {
-	out := new(SaveFileChunksResponse)
-	err := c.cc.Invoke(ctx, FileChunksService_SaveFileChunks_FullMethodName, in, out, opts...)
+func (c *fileChunksServiceClient) CreateFileChunks(ctx context.Context, in *CreateFileChunksRequest, opts ...grpc.CallOption) (*CreateFileChunksResponse, error) {
+	out := new(CreateFileChunksResponse)
+	err := c.cc.Invoke(ctx, FileChunksService_CreateFileChunks_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (c *fileChunksServiceClient) GetSortedFileChunksContent(ctx context.Context
 // All implementations must embed UnimplementedFileChunksServiceServer
 // for forward compatibility
 type FileChunksServiceServer interface {
-	SaveFileChunks(context.Context, *SaveFileChunksRequest) (*SaveFileChunksResponse, error)
+	CreateFileChunks(context.Context, *CreateFileChunksRequest) (*CreateFileChunksResponse, error)
 	GetSortedFileChunksContent(context.Context, *GetSortedFileChunksContentRequest) (*GetSortedFileChunksContentResponse, error)
 	mustEmbedUnimplementedFileChunksServiceServer()
 }
@@ -70,8 +70,8 @@ type FileChunksServiceServer interface {
 type UnimplementedFileChunksServiceServer struct {
 }
 
-func (UnimplementedFileChunksServiceServer) SaveFileChunks(context.Context, *SaveFileChunksRequest) (*SaveFileChunksResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SaveFileChunks not implemented")
+func (UnimplementedFileChunksServiceServer) CreateFileChunks(context.Context, *CreateFileChunksRequest) (*CreateFileChunksResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateFileChunks not implemented")
 }
 func (UnimplementedFileChunksServiceServer) GetSortedFileChunksContent(context.Context, *GetSortedFileChunksContentRequest) (*GetSortedFileChunksContentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSortedFileChunksContent not implemented")
@@ -89,20 +89,20 @@ func RegisterFileChunksServiceServer(s grpc.ServiceRegistrar, srv FileChunksServ
 	s.RegisterService(&FileChunksService_ServiceDesc, srv)
 }
 
-func _FileChunksService_SaveFileChunks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SaveFileChunksRequest)
+func _FileChunksService_CreateFileChunks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateFileChunksRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(FileChunksServiceServer).SaveFileChunks(ctx, in)
+		return srv.(FileChunksServiceServer).CreateFileChunks(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: FileChunksService_SaveFileChunks_FullMethodName,
+		FullMethod: FileChunksService_CreateFileChunks_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FileChunksServiceServer).SaveFileChunks(ctx, req.(*SaveFileChunksRequest))
+		return srv.(FileChunksServiceServer).CreateFileChunks(ctx, req.(*CreateFileChunksRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -133,8 +133,8 @@ var FileChunksService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*FileChunksServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "SaveFileChunks",
-			Handler:    _FileChunksService_SaveFileChunks_Handler,
+			MethodName: "CreateFileChunks",
+			Handler:    _FileChunksService_CreateFileChunks_Handler,
 		},
 		{
 			MethodName: "GetSortedFileChunksContent",

@@ -34,8 +34,8 @@ func (f *FileChunksServiceHandler) GetSortedFileChunksContent(ctx context.Contex
 	return resp, nil
 }
 
-func (f *FileChunksServiceHandler) SaveFileChunks(ctx context.Context, req *pb.SaveFileChunksRequest) (*pb.SaveFileChunksResponse, error) {
-	log.Println("received SaveFileChunks request")
+func (f *FileChunksServiceHandler) CreateFileChunks(ctx context.Context, req *pb.CreateFileChunksRequest) (*pb.CreateFileChunksResponse, error) {
+	log.Println("received CreateFileChunks request")
 
 	fileStorageIds, err := batchSaveFileChunkPayloadContents(req.FileChunkPayloads)
 	if err != nil {
@@ -51,7 +51,7 @@ func (f *FileChunksServiceHandler) SaveFileChunks(ctx context.Context, req *pb.S
 
 	fileChunkSaveStatuses := fcss.GetSingletonInstance().ReportFileChunkSaves(fileChunks)
 
-	resp := &pb.SaveFileChunksResponse{
+	resp := &pb.CreateFileChunksResponse{
 		FileChunkStatuses: castToPbFileChunkSaveStatuses(fileChunkSaveStatuses),
 	}
 
