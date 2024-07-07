@@ -3,7 +3,7 @@ package database
 import "sync"
 
 type FileChunk struct {
-	UserId         string
+	RepositoryId   string
 	FilePath       string
 	ChunkIndex     int
 	NumTotalChunks int

@@ -17,7 +17,7 @@ type FileChunksServiceHandler struct {
 func (f *FileChunksServiceHandler) GetSortedFileChunksContent(ctx context.Context, req *pb.GetSortedFileChunksContentRequest) (*pb.GetSortedFileChunksContentResponse, error) {
 	log.Println("received GetSortedFileChunksContent request")
 
-	fileStorageIds, err := db.GetSingletonInstance().GetSortedFileChunksFileStorageIds(req.UserId, req.FilePath)
+	fileStorageIds, err := db.GetSingletonInstance().GetSortedFileChunksFileStorageIds(req.RepositoryId, req.FilePath)
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +102,7 @@ func getFileChunks(fileChunkPayloads []*pb.FileChunkPayload, fileStorageIds []st
 
 	for i, fileChunkPayload := range fileChunkPayloads {
 		fileChunks = append(fileChunks, db.FileChunk{
-			UserId:         fileChunkPayload.UserId,
+			RepositoryId:   fileChunkPayload.RepositoryId,
 			FilePath:       fileChunkPayload.FilePath,
 			ChunkIndex:     int(fileChunkPayload.ChunkIndex),
 			NumTotalChunks: int(fileChunkPayload.NumTotalChunks),

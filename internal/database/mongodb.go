@@ -44,9 +44,9 @@ func (mongodb *MongoDb) Close() error {
 	return nil
 }
 
-func (mongodb *MongoDb) GetSortedFileChunksFileStorageIds(userId string, filePath string) ([]string, error) {
+func (mongodb *MongoDb) GetSortedFileChunksFileStorageIds(repositoryId string, filePath string) ([]string, error) {
 	filter := bson.D{
-		{"userid", userId},
+		{"repositoryid", repositoryId},
 		{"filepath", filePath},
 	}
 

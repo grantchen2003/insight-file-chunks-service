@@ -44,57 +44,57 @@ func (f *FileChunkSaveSync) ReportFileChunkSaves(fileChunks []db.FileChunk) []Fi
 	statuses := make([]FileChunkSaveStatus, len(fileChunks))
 
 	for i, fileChunk := range fileChunks {
-		f.addFileChunk(fileChunk.UserId, fileChunk.FilePath, fileChunk.ChunkIndex, fileChunk.NumTotalChunks)
+		f.addFileChunk(fileChunk.RepositoryId, fileChunk.FilePath, fileChunk.ChunkIndex, fileChunk.NumTotalChunks)
 
-		isLastSavedChunk := f.isFullySaved(fileChunk.UserId, fileChunk.FilePath)
+		isLastSavedChunk := f.isFullySaved(fileChunk.RepositoryId, fileChunk.FilePath)
 
 		statuses[i] = FileChunkSaveStatus{IsLastSavedChunk: isLastSavedChunk, FilePath: fileChunk.FilePath}
 
-		f.cleanupFileChunks(fileChunk.UserId, fileChunk.FilePath)
+		f.cleanupFileChunks(fileChunk.RepositoryId, fileChunk.FilePath)
 	}
 
 	return statuses
 }
 
-func (f *FileChunkSaveSync) addFileChunk(userId string, filePath string, chunkIndex int, numTotalChunks int) {
-	if _, userIdExists := f.data[userId]; !userIdExists {
-		f.data[userId] = make(map[string]FileSaveStatus)
+func (f *FileChunkSaveSync) addFileChunk(repositoryId string, filePath string, chunkIndex int, numTotalChunks int) {
+	if _, repositoryIdExists := f.data[repositoryId]; !repositoryIdExists {
+		f.data[repositoryId] = make(map[string]FileSaveStatus)
 	}
 
-	if _, filePathExists := f.data[userId][filePath]; !filePathExists {
-		f.data[userId][filePath] = FileSaveStatus{isFullySaved: false, chunksSaveStatus: make([]bool, numTotalChunks)}
+	if _, filePathExists := f.data[repositoryId][filePath]; !filePathExists {
+		f.data[repositoryId][filePath] = FileSaveStatus{isFullySaved: false, chunksSaveStatus: make([]bool, numTotalChunks)}
 	}
 
-	f.markChunkAsSaved(userId, filePath, int(chunkIndex))
-	f.updateIsFullySaved(userId, filePath)
+	f.markChunkAsSaved(repositoryId, filePath, int(chunkIndex))
+	f.updateIsFullySaved(repositoryId, filePath)
 }
 
-func (f *FileChunkSaveSync) markChunkAsSaved(userId string, filePath string, chunkIndex int) {
-	f.data[userId][filePath].chunksSaveStatus[chunkIndex] = true
+func (f *FileChunkSaveSync) markChunkAsSaved(repositoryId string, filePath string, chunkIndex int) {
+	f.data[repositoryId][filePath].chunksSaveStatus[chunkIndex] = true
 }
 
-func (f *FileChunkSaveSync) isFullySaved(userId string, filePath string) bool {
-	return f.data[userId][filePath].isFullySaved
+func (f *FileChunkSaveSync) isFullySaved(repositoryId string, filePath string) bool {
+	return f.data[repositoryId][filePath].isFullySaved
 }
 
-func (f *FileChunkSaveSync) updateIsFullySaved(userId string, filePath string) {
-	for _, chunkIsSaved := range f.data[userId][filePath].chunksSaveStatus {
+func (f *FileChunkSaveSync) updateIsFullySaved(repositoryId string, filePath string) {
+	for _, chunkIsSaved := range f.data[repositoryId][filePath].chunksSaveStatus {
 		if !chunkIsSaved {
 			break
 		}
 	}
 
-	fileSaveStatus := f.data[userId][filePath]
+	fileSaveStatus := f.data[repositoryId][filePath]
 	fileSaveStatus.isFullySaved = true
-	f.data[userId][filePath] = fileSaveStatus
+	f.data[repositoryId][filePath] = fileSaveStatus
 }
 
-func (f *FileChunkSaveSync) cleanupFileChunks(userId string, filePath string) {
-	if f.isFullySaved(userId, filePath) {
-		delete(f.data[userId], filePath)
+func (f *FileChunkSaveSync) cleanupFileChunks(repositoryId string, filePath string) {
+	if f.isFullySaved(repositoryId, filePath) {
+		delete(f.data[repositoryId], filePath)
 	}
 
-	if len(f.data[userId]) == 0 {
-		delete(f.data, userId)
+	if len(f.data[repositoryId]) == 0 {
+		delete(f.data, repositoryId)
 	}
 }

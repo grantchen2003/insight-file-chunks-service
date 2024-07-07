@@ -48,7 +48,7 @@ func (mySql *MySql) createFileChunksTable() error {
 	query := `
 		CREATE TABLE IF NOT EXISTS file_chunks (
 			id INT PRIMARY KEY AUTO_INCREMENT,
-			user_id VARCHAR(255),
+			repository_id VARCHAR(255),
 			file_path VARCHAR(255),
 			chunk_index INT,
 			num_total_chunks INT
@@ -92,13 +92,13 @@ func (mySql *MySql) BatchSaveFileChunks(fileChunks []FileChunk) error {
 	log.Println("here3")
 
 	// Prepare the SQL query.
-	query := "INSERT INTO file_chunks (user_id, file_path, chunk_index, num_total_chunks) VALUES "
+	query := "INSERT INTO file_chunks (repository_id, file_path, chunk_index, num_total_chunks) VALUES "
 	placeholders := []string{}
 	values := []interface{}{}
 
 	for _, fileChunk := range fileChunks {
 		placeholders = append(placeholders, "(?, ?, ?, ?)")
-		values = append(values, fileChunk.UserId, fileChunk.FilePath, fileChunk.ChunkIndex, fileChunk.NumTotalChunks)
+		values = append(values, fileChunk.RepositoryId, fileChunk.FilePath, fileChunk.ChunkIndex, fileChunk.NumTotalChunks)
 	}
 
 	query += fmt.Sprintf("%s", strings.Join(placeholders, ","))
