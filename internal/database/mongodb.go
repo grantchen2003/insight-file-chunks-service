@@ -77,6 +77,30 @@ func (mongodb *MongoDb) GetSortedFileChunksFileStorageIds(repositoryId string, f
 	return fileStorageIds, nil
 }
 
+func (mongodb *MongoDb) GetFileChunksFileStorageIdsByRepositoryId(repositoryId string) ([]string, error) {
+	filter := bson.D{{"repositoryid", repositoryId}}
+	findOptions := options.Find()
+	findOptions.SetProjection(bson.D{{"filestorageid", 1}})
+
+	cursor, err := mongodb.getCollection().Find(context.TODO(), filter, findOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	var results []map[string]string
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		return nil, err
+	}
+
+	var fileStorageIds []string
+	for _, result := range results {
+		cursor.Decode(&result)
+		fileStorageIds = append(fileStorageIds, result["filestorageid"])
+	}
+
+	return fileStorageIds, nil
+}
+
 func (mongodb *MongoDb) SaveFileChunk(fileChunk FileChunk) error {
 	_, err := mongodb.getCollection().InsertOne(context.Background(), fileChunk)
 

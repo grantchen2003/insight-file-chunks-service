@@ -8,6 +8,7 @@ type FileStorage interface {
 	GetFileContents([]string) ([]FileChunkContent, error)
 	BatchSaveFileChunksContent([]FileChunkContent) ([]string, error)
 	SaveFileChunkContent(FileChunkContent) (string, error)
+	BatchDeleteFileChunksContent([]string) error
 }
 
 var (

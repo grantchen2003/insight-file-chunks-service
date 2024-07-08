@@ -64,6 +64,15 @@ func (f *FileChunksServiceHandler) DeleteFileChunksByRepositoryId(ctx context.Co
 
 	database := db.GetSingletonInstance()
 
+	fileStorageIds, err := database.GetFileChunksFileStorageIdsByRepositoryId(req.RepositoryId)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := filestorage.GetSingletonInstance().BatchDeleteFileChunksContent(fileStorageIds); err != nil {
+		return nil, err
+	}
+
 	if err := database.DeleteFileChunksByRepositoryId(req.RepositoryId); err != nil {
 		return nil, err
 	}

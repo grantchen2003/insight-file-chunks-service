@@ -78,6 +78,32 @@ func (lfs *LocalFileStorage) SaveFileChunkContent(fileChunkContent FileChunkCont
 	return id, nil
 }
 
+func (lfs *LocalFileStorage) BatchDeleteFileChunksContent(ids []string) error {
+	fileNames := make(map[string]struct{})
+	for _, id := range ids {
+		fileNames[id] = struct{}{}
+	}
+
+	entries, err := os.ReadDir(lfs.storageFolderPath)
+	if err != nil {
+		return err
+	}
+
+	for _, entry := range entries {
+		_, exists := fileNames[entry.Name()]
+		if !exists {
+			continue
+		}
+
+		filePath := filepath.Join(lfs.storageFolderPath, entry.Name())
+		if err := os.Remove(filePath); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (lfs *LocalFileStorage) ensureStorageFolderExists() error {
 	if _, err := os.Stat(lfs.storageFolderPath); os.IsExist(err) {
 		return nil
