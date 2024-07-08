@@ -16,6 +16,7 @@ type Database interface {
 	GetSortedFileChunksFileStorageIds(string, string) ([]string, error)
 	SaveFileChunk(FileChunk) error
 	BatchSaveFileChunks([]FileChunk) error
+	DeleteFileChunksByRepositoryId(string) error
 }
 
 var (

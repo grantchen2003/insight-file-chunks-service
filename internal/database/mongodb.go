@@ -95,6 +95,14 @@ func (mongodb *MongoDb) BatchSaveFileChunks(fileChunks []FileChunk) error {
 	return err
 }
 
+func (mongodb *MongoDb) DeleteFileChunksByRepositoryId(repositoryId string) error {
+	filter := bson.D{{"repositoryid", repositoryId}}
+
+	_, err := mongodb.getCollection().DeleteMany(context.TODO(), filter)
+
+	return err
+}
+
 func (mongodb *MongoDb) getCollection() *mongo.Collection {
 	databaseName := os.Getenv("MONGODB_DATABASE_NAME")
 	collectionName := os.Getenv("MONGODB_COLLECTION_NAME")

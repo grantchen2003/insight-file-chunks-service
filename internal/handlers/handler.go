@@ -8,6 +8,7 @@ import (
 	"github.com/grantchen2003/insight/filechunks/internal/filestorage"
 	pb "github.com/grantchen2003/insight/filechunks/internal/protobufs"
 	fcss "github.com/grantchen2003/insight/filechunks/internal/utils/filechunksavesync"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type FileChunksServiceHandler struct {
@@ -56,6 +57,19 @@ func (f *FileChunksServiceHandler) CreateFileChunks(ctx context.Context, req *pb
 	}
 
 	return resp, nil
+}
+
+func (f *FileChunksServiceHandler) DeleteFileChunksByRepositoryId(ctx context.Context, req *pb.DeleteFileChunksByRepositoryIdRequest) (*emptypb.Empty, error) {
+	log.Println("received DeleteFileChunksByRepositoryId request")
+
+	database := db.GetSingletonInstance()
+
+	if err := database.DeleteFileChunksByRepositoryId(req.RepositoryId); err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
+
 }
 
 func castToPbFileChunksContent(fileChunksContent []filestorage.FileChunkContent) []*pb.FileChunkContent {
