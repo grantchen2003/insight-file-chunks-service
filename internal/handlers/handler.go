@@ -81,6 +81,27 @@ func (f *FileChunksServiceHandler) DeleteFileChunksByRepositoryId(ctx context.Co
 
 }
 
+func (f *FileChunksServiceHandler) DeleteFileChunksByRepositoryIdAndFilePaths(ctx context.Context, req *pb.DeleteFileChunksByRepositoryIdAndFilePathsRequest) (*emptypb.Empty, error) {
+	log.Println("received DeleteFileChunksByRepositoryIdAndFilePaths request")
+
+	database := db.GetSingletonInstance()
+
+	fileStorageIds, err := database.GetFileChunksFileStorageIdsByRepositoryIdAndFilePaths(req.RepositoryId, req.FilePaths)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := filestorage.GetSingletonInstance().BatchDeleteFileChunksContent(fileStorageIds); err != nil {
+		return nil, err
+	}
+
+	if err := database.DeleteFileChunksByRepositoryId(req.RepositoryId); err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
 func castToPbFileChunksContent(fileChunksContent []filestorage.FileChunkContent) []*pb.FileChunkContent {
 	var pbFileChunksContent []*pb.FileChunkContent
 

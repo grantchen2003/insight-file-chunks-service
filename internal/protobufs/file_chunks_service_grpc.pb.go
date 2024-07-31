@@ -20,9 +20,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	FileChunksService_CreateFileChunks_FullMethodName               = "/FileChunksService/CreateFileChunks"
-	FileChunksService_GetSortedFileChunksContent_FullMethodName     = "/FileChunksService/GetSortedFileChunksContent"
-	FileChunksService_DeleteFileChunksByRepositoryId_FullMethodName = "/FileChunksService/DeleteFileChunksByRepositoryId"
+	FileChunksService_CreateFileChunks_FullMethodName                           = "/FileChunksService/CreateFileChunks"
+	FileChunksService_GetSortedFileChunksContent_FullMethodName                 = "/FileChunksService/GetSortedFileChunksContent"
+	FileChunksService_DeleteFileChunksByRepositoryId_FullMethodName             = "/FileChunksService/DeleteFileChunksByRepositoryId"
+	FileChunksService_DeleteFileChunksByRepositoryIdAndFilePaths_FullMethodName = "/FileChunksService/DeleteFileChunksByRepositoryIdAndFilePaths"
 )
 
 // FileChunksServiceClient is the client API for FileChunksService service.
@@ -32,6 +33,7 @@ type FileChunksServiceClient interface {
 	CreateFileChunks(ctx context.Context, in *CreateFileChunksRequest, opts ...grpc.CallOption) (*CreateFileChunksResponse, error)
 	GetSortedFileChunksContent(ctx context.Context, in *GetSortedFileChunksContentRequest, opts ...grpc.CallOption) (*GetSortedFileChunksContentResponse, error)
 	DeleteFileChunksByRepositoryId(ctx context.Context, in *DeleteFileChunksByRepositoryIdRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteFileChunksByRepositoryIdAndFilePaths(ctx context.Context, in *DeleteFileChunksByRepositoryIdAndFilePathsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type fileChunksServiceClient struct {
@@ -69,6 +71,15 @@ func (c *fileChunksServiceClient) DeleteFileChunksByRepositoryId(ctx context.Con
 	return out, nil
 }
 
+func (c *fileChunksServiceClient) DeleteFileChunksByRepositoryIdAndFilePaths(ctx context.Context, in *DeleteFileChunksByRepositoryIdAndFilePathsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, FileChunksService_DeleteFileChunksByRepositoryIdAndFilePaths_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // FileChunksServiceServer is the server API for FileChunksService service.
 // All implementations must embed UnimplementedFileChunksServiceServer
 // for forward compatibility
@@ -76,6 +87,7 @@ type FileChunksServiceServer interface {
 	CreateFileChunks(context.Context, *CreateFileChunksRequest) (*CreateFileChunksResponse, error)
 	GetSortedFileChunksContent(context.Context, *GetSortedFileChunksContentRequest) (*GetSortedFileChunksContentResponse, error)
 	DeleteFileChunksByRepositoryId(context.Context, *DeleteFileChunksByRepositoryIdRequest) (*emptypb.Empty, error)
+	DeleteFileChunksByRepositoryIdAndFilePaths(context.Context, *DeleteFileChunksByRepositoryIdAndFilePathsRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedFileChunksServiceServer()
 }
 
@@ -91,6 +103,9 @@ func (UnimplementedFileChunksServiceServer) GetSortedFileChunksContent(context.C
 }
 func (UnimplementedFileChunksServiceServer) DeleteFileChunksByRepositoryId(context.Context, *DeleteFileChunksByRepositoryIdRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteFileChunksByRepositoryId not implemented")
+}
+func (UnimplementedFileChunksServiceServer) DeleteFileChunksByRepositoryIdAndFilePaths(context.Context, *DeleteFileChunksByRepositoryIdAndFilePathsRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteFileChunksByRepositoryIdAndFilePaths not implemented")
 }
 func (UnimplementedFileChunksServiceServer) mustEmbedUnimplementedFileChunksServiceServer() {}
 
@@ -159,6 +174,24 @@ func _FileChunksService_DeleteFileChunksByRepositoryId_Handler(srv interface{}, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _FileChunksService_DeleteFileChunksByRepositoryIdAndFilePaths_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteFileChunksByRepositoryIdAndFilePathsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FileChunksServiceServer).DeleteFileChunksByRepositoryIdAndFilePaths(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FileChunksService_DeleteFileChunksByRepositoryIdAndFilePaths_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FileChunksServiceServer).DeleteFileChunksByRepositoryIdAndFilePaths(ctx, req.(*DeleteFileChunksByRepositoryIdAndFilePathsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // FileChunksService_ServiceDesc is the grpc.ServiceDesc for FileChunksService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -177,6 +210,10 @@ var FileChunksService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteFileChunksByRepositoryId",
 			Handler:    _FileChunksService_DeleteFileChunksByRepositoryId_Handler,
+		},
+		{
+			MethodName: "DeleteFileChunksByRepositoryIdAndFilePaths",
+			Handler:    _FileChunksService_DeleteFileChunksByRepositoryIdAndFilePaths_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

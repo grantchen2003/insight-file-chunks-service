@@ -15,6 +15,7 @@ type Database interface {
 	Close() error
 	GetSortedFileChunksFileStorageIds(string, string) ([]string, error)
 	GetFileChunksFileStorageIdsByRepositoryId(string) ([]string, error)
+	GetFileChunksFileStorageIdsByRepositoryIdAndFilePaths(string, []string) ([]string, error)
 	SaveFileChunk(FileChunk) error
 	BatchSaveFileChunks([]FileChunk) error
 	DeleteFileChunksByRepositoryId(string) error
