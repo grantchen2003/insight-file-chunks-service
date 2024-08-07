@@ -61,7 +61,7 @@ message DeleteFileChunksByRepositoryIdAndFilePathsRequest {
 
 service FileChunksService {
     rpc CreateFileChunks(CreateFileChunksRequest) returns (CreateFileChunksResponse);
-    rpc GetSortedFileChunksContent(GetSortedFileChunksContentRequest) returns (GetSortedFileChunksContentResponse);
+    rpc GetSortedFileChunksContent(GetSortedFileChunksContentRequest) returns (stream FileChunkContent);
     rpc DeleteFileChunksByRepositoryId(DeleteFileChunksByRepositoryIdRequest) returns (google.protobuf.Empty);
     rpc DeleteFileChunksByRepositoryIdAndFilePaths(DeleteFileChunksByRepositoryIdAndFilePathsRequest) returns (google.protobuf.Empty);
 }

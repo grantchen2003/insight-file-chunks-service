@@ -7,7 +7,6 @@ import (
 	db "github.com/grantchen2003/insight/filechunks/internal/database"
 	"github.com/grantchen2003/insight/filechunks/internal/filestorage"
 	pb "github.com/grantchen2003/insight/filechunks/internal/protobufs"
-	fcss "github.com/grantchen2003/insight/filechunks/internal/utils/filechunksavesync"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -15,24 +14,27 @@ type FileChunksServiceHandler struct {
 	pb.FileChunksServiceServer
 }
 
-func (f *FileChunksServiceHandler) GetSortedFileChunksContent(ctx context.Context, req *pb.GetSortedFileChunksContentRequest) (*pb.GetSortedFileChunksContentResponse, error) {
+func (f *FileChunksServiceHandler) GetSortedFileChunksContent(req *pb.GetSortedFileChunksContentRequest, stream pb.FileChunksService_GetSortedFileChunksContentServer) error {
 	log.Println("received GetSortedFileChunksContent request")
 
 	fileStorageIds, err := db.GetSingletonInstance().GetSortedFileChunksFileStorageIds(req.RepositoryId, req.FilePath)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	fileChunksContent, err := filestorage.GetSingletonInstance().GetFileContents(fileStorageIds)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	resp := &pb.GetSortedFileChunksContentResponse{
-		FileChunksContent: castToPbFileChunksContent(fileChunksContent),
+	for _, fileChunkContent := range fileChunksContent {
+		response := &pb.FileChunkContent{Content: fileChunkContent}
+		if err := stream.Send(response); err != nil {
+			return err
+		}
 	}
 
-	return resp, nil
+	return nil
 }
 
 func (f *FileChunksServiceHandler) CreateFileChunks(ctx context.Context, req *pb.CreateFileChunksRequest) (*pb.CreateFileChunksResponse, error) {
@@ -45,12 +47,17 @@ func (f *FileChunksServiceHandler) CreateFileChunks(ctx context.Context, req *pb
 
 	fileChunks := getFileChunks(req.FileChunkPayloads, fileStorageIds)
 
-	err = db.GetSingletonInstance().BatchSaveFileChunks(fileChunks)
+	database := db.GetSingletonInstance()
+
+	err = database.BatchSaveFileChunks(fileChunks)
 	if err != nil {
 		return nil, err
 	}
 
-	fileChunkSaveStatuses := fcss.GetSingletonInstance().ReportFileChunkSaves(fileChunks)
+	fileChunkSaveStatuses, err := database.ReportFileChunkSaves(fileChunks)
+	if err != nil {
+		return nil, err
+	}
 
 	resp := &pb.CreateFileChunksResponse{
 		FileChunkStatuses: castToPbFileChunkSaveStatuses(fileChunkSaveStatuses),
@@ -114,7 +121,7 @@ func castToPbFileChunksContent(fileChunksContent []filestorage.FileChunkContent)
 	return pbFileChunksContent
 }
 
-func castToPbFileChunkSaveStatuses(fileChunkSaveStatuses []fcss.FileChunkSaveStatus) []*pb.FileChunkSaveStatus {
+func castToPbFileChunkSaveStatuses(fileChunkSaveStatuses []db.FileChunkSaveStatus) []*pb.FileChunkSaveStatus {
 	var pbFileChunkSaveStatuses []*pb.FileChunkSaveStatus
 
 	for _, fileChunkSaveStatus := range fileChunkSaveStatuses {

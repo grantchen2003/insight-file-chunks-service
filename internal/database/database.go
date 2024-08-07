@@ -10,6 +10,11 @@ type FileChunk struct {
 	FileStorageId  string
 }
 
+type FileChunkSaveStatus struct {
+	FilePath         string
+	IsLastSavedChunk bool
+}
+
 type Database interface {
 	Connect() error
 	Close() error
@@ -19,6 +24,7 @@ type Database interface {
 	SaveFileChunk(FileChunk) error
 	BatchSaveFileChunks([]FileChunk) error
 	DeleteFileChunksByRepositoryId(string) error
+	ReportFileChunkSaves([]FileChunk) ([]FileChunkSaveStatus, error)
 }
 
 var (
