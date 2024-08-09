@@ -191,9 +191,21 @@ func (mongodb *MongoDb) ReportFileChunkSaves(fileChunks []FileChunk) ([]FileChun
 			return nil, err
 		}
 
+		isLastSavedChunk := updatedDocument["num_chunks_saved"] == updatedDocument["num_total_chunks"]
+
+		if isLastSavedChunk {
+			filter := bson.D{
+				{"repositoryid", fileChunk.RepositoryId},
+				{"filepath", fileChunk.FilePath},
+			}
+			if _, err := collection.DeleteOne(context.TODO(), filter); err != nil {
+				return nil, err
+			}
+		}
+
 		fileChunkSaveStatus = append(fileChunkSaveStatus, FileChunkSaveStatus{
 			FilePath:         fileChunk.FilePath,
-			IsLastSavedChunk: updatedDocument["num_chunks_saved"] == updatedDocument["num_total_chunks"],
+			IsLastSavedChunk: isLastSavedChunk,
 		})
 	}
 
